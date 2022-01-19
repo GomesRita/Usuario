@@ -16,15 +16,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.UniqueConstraint;
-
-//import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@SQLDelete(sql = "update Usuario set status = false  where id = ?" )
+@Where(clause = "status = false")
 @SequenceGenerator(name = "seq_user", sequenceName = "seq_user", allocationSize = 1, initialValue = 1)
-//@SQLDelete(sql = "update Usuario set ativo = 0 where id = ?")
 public class Usuario implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
@@ -32,6 +33,7 @@ public class Usuario implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_user")
 	private Long id;
+	
 	
 	@Column(unique = true)
 	private String login;
@@ -49,6 +51,8 @@ public class Usuario implements UserDetails {
 	private String email;
 	
 	private String token;
+	
+	private boolean status;
 
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(	name = "usuarios_role", uniqueConstraints = @UniqueConstraint(
@@ -152,13 +156,21 @@ public class Usuario implements UserDetails {
 		this.token = token;
 	}
 	
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+	
 	public List<Role> getRoles() {
 		return roles;
 	}
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
-	}
+	}	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -222,5 +234,3 @@ public class Usuario implements UserDetails {
 	
 
 }
-
-
